@@ -1,28 +1,50 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <div class="container-fluid full-height centered bg-grey">
+      <div class="row">
+        <div class="col">
+          <h1 class="m-md-2 brand-primary-color">Technical task</h1>
+          <input type="text" placeholder="Enter your name" class="m-md-2 w-100">
+          <b-dropdown
+              text="Select test"
+              block
+              class="m-2"
+              menu-class="w-100"
+          >
+            <b-dropdown-item href="#">Action</b-dropdown-item>
+            <b-dropdown-item href="#">Another action</b-dropdown-item>
+            <b-dropdown-item href="#">Something else here</b-dropdown-item>
+          </b-dropdown>
+          <button class="btn btn-block rounded-pill m-md-2 bg-brand-primary">Start</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
 
 export default {
   name: "App",
   components: {
-    HelloWorld,
   },
 };
 </script>
 
 <style lang="scss">
+@import "assets/scss/main";
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  button {
+    color: $white;
+    border-color: transparent;
+    font-size: $text-size;
+    &:hover {
+      opacity: .8;
+      border-color: transparent;
+    }
+  }
+  input {
+    display: block;
+  }
 }
 </style>
