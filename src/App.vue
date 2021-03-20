@@ -1,41 +1,104 @@
 <template>
-  <div id="app">
-    <div class="container-fluid full-height flex-center flex-column bg-grey">
-      <div class="row">
-        <div class="col">
-          <h1 class="mb-5 brand-primary-color">Technical task</h1>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="group m-md-2">
-            <input id="name" type="text" placeholder="Enter your name" class="w-100">
-            <label for="name">Enter your name</label>
-          </div>
-          <b-dropdown
-              text="Select test"
-              block
-              class="m-md-2"
-              menu-class="w-100"
-          >
-            <b-dropdown-item href="#">Action</b-dropdown-item>
-            <b-dropdown-item href="#">Another action</b-dropdown-item>
-            <b-dropdown-item href="#">Something else here</b-dropdown-item>
-          </b-dropdown>
-          <div class="m-2">
-            <button class="btn btn-block rounded-pill bg-brand-primary">Start</button>
-          </div>
-        </div>
-      </div>
+  <div
+    id="app"
+    class="container-fluid full-height flex-center flex-column bg-grey"
+  >
+    <Title :title="title" />
+    <FirstStep v-if="!showQuestions" @start-test="startTest" :tests="availableTests"/>
+    <div v-if="showQuestions">
+      <Question :question="question" @next-question="nextQuestion()"/>
+      <b-progress :value="step" :max="questions.length" animated variant="success" class="mt-2" ></b-progress>
     </div>
   </div>
 </template>
 
 <script>
+import FirstStep from "@/components/FirstStep";
+import Title from "@/components/Title";
+import Question from "@/components/Question";
 
 export default {
   name: "App",
   components: {
+    FirstStep,
+    Title,
+    Question,
+  },
+  methods: {
+    startTest(name) {
+      this.name = name;
+      this.questions = this.getTestQuestions();
+      this.question = this.questions[this.step];
+      this.showQuestions = true;
+      this.title = this.questions[this.step].title;
+    },
+    getTestQuestions() {
+      return [
+        {
+          id: 1715,
+          title:
+            "Who is The Elven Sword-Wielding, Green Clothed Hero in the Legend of Zelda series?",
+        },
+        {
+          id: 2243,
+          title:
+            "In what game series are Golden Rings used as life-energy and money",
+        },
+        {
+          id: 3193,
+          title: 'What part of an Xbox 360 causes the "Red Ring of Death"?',
+        },
+        {
+          id: 6001,
+          title: "NES was short for....?",
+        },
+        {
+          id: 8696,
+          title:
+            "How many forms does The Final Boss of The Legend of Dragoon Have?",
+        },
+        {
+          id: 14998,
+          title: "What was the first home console?",
+        },
+      ];
+    },
+    getTests() {
+      //Implement get request
+    },
+    nextQuestion() {
+      this.step++;
+      this.question = this.questions[this.step];
+      this.title = this.questions[this.step].title;
+      console.log(this.step)
+    }
+  },
+  data() {
+    return {
+      title: "Technical task Printful",
+      showQuestions: false,
+      name: "",
+      availableTests: [],
+      questions: [],
+      question: {},
+      step: 0,
+    };
+  },
+  created() {
+    this.availableTests = [
+      {
+        id: 1,
+        title: "Video Games",
+      },
+      {
+        id: 2,
+        title: "Numbers",
+      },
+      {
+        id: 3,
+        title: "Movies",
+      },
+    ];
   },
 };
 </script>
@@ -43,39 +106,41 @@ export default {
 <style lang="scss">
 @import "assets/scss/main";
 #app {
-  button {
+  .custom-button {
     color: $white;
     border-color: transparent;
     font-size: $text-size;
+    min-width: 150px;
     &:hover {
-      opacity: .8;
+      opacity: 0.8;
       border-color: transparent;
     }
   }
   .group {
     position: relative;
   }
-  input {
+  input[type="text"] {
     display: block;
     transition: all 0.1s;
     font-size: $text-size;
     padding: 5px 10px;
+    min-width: 250px;
   }
-  input:placeholder-shown + label {
-    opacity:0;
+  input[type="text"]:placeholder-shown + label {
+    opacity: 0;
     transform: translateY(100%);
   }
-  input + label {
+  input[type="text"] + label {
     position: absolute;
     top: -18px;
     left: 10px;
     transition: all 0.1s;
-    opacity:1;
+    opacity: 1;
     font-size: $text-size-sm;
   }
-  input:focus {
-    outline:0;
-    border-color:$primary;
+  input[type="text"]:focus {
+    outline: 0;
+    border-color: $primary;
   }
 }
 </style>
