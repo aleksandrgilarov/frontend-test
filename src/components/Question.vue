@@ -15,7 +15,7 @@
         option.title
       }}</label>
     </div>
-    <div class="col">
+    <div class="col-12">
       <input
         type="button"
         @click="nextStep()"
@@ -31,34 +31,19 @@
 <script>
 export default {
   name: "Question",
-  props: ["question"],
+  props: ["question", "quizid"],
   methods: {
-    nextStep() {
-      this.$emit("next-question");
+    async nextStep() {
+      this.$emit("next-question", this.checkedOptions);
       this.checkedOptions = [];
-      this.options = this.getOptions();
-      console.log(this.question.id);
-      console.log(this.checkedOptions);
+      this.options = await this.getOptions();
     },
-    getOptions() {
-      return [
-        {
-          id: 14030,
-          title: "huink",
-        },
-        {
-          id: 24569,
-          title: "sdf",
-        },
-        {
-          id: 27897,
-          title: "sdf",
-        },
-        {
-          id: 28471,
-          title: "sdfsdffsdfsd",
-        },
-      ];
+    async getOptions() {
+      const res = await fetch(
+        `https://printful.com/test-quiz.php?action=answers&quizId=${this.quizid}&questionId=${this.question.id}`
+      );
+
+      return await res.json();
     },
   },
   data() {
@@ -68,26 +53,8 @@ export default {
       btnText: "Next",
     };
   },
-  created() {
-    console.log("worked question component");
-    this.options = [
-      {
-        id: 14030,
-        title: "Link",
-      },
-      {
-        id: 24569,
-        title: "Luigi",
-      },
-      {
-        id: 27897,
-        title: "Ganon",
-      },
-      {
-        id: 28471,
-        title: "Zelda",
-      },
-    ];
+  async created() {
+    this.options = await this.getOptions();
   },
 };
 </script>

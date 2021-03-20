@@ -33,19 +33,26 @@
 <script>
 export default {
   name: "FirstStep",
-  props: ["tests"],
   methods: {
     startTest() {
       if (!this.name || !this.selectedTest) {
         this.showAlert = true;
       } else {
-        this.$emit("start-test", this.name); // TO-DO: pass testID
+        this.$emit("start-test", this.name, this.selectedTest);
       }
+    },
+    async getTests() {
+      const res = await fetch(
+        "https://printful.com/test-quiz.php?action=quizzes"
+      );
+
+      return await res.json();
     },
   },
   data() {
     return {
       name: "",
+      tests: [],
       selectedTest: null,
       options: [
         { value: null, text: "Please select a Test" },
@@ -53,7 +60,8 @@ export default {
       showAlert: false,
     };
   },
-  created() {
+  async created() {
+    this.tests = await this.getTests();
     this.tests.forEach((test) => {
       this.options.push({ value: test.id, text: test.title });
     });

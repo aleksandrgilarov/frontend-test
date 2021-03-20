@@ -4,9 +4,9 @@
     class="container-fluid full-height flex-center flex-column bg-grey"
   >
     <Title :title="title" />
-    <FirstStep v-if="!showQuestions" @start-test="startTest" :tests="availableTests"/>
+    <FirstStep v-if="!showQuestions" @start-test="startTest"/>
     <div v-if="showQuestions">
-      <Question :question="question" @next-question="nextQuestion()"/>
+      <Question :quizid="quizID" :question="question" @next-question="nextQuestion"/>
       <b-progress :value="step" :max="questions.length" animated variant="success" class="mt-2" ></b-progress>
     </div>
   </div>
@@ -25,80 +25,56 @@ export default {
     Question,
   },
   methods: {
-    startTest(name) {
+    async startTest(name, id) {
       this.name = name;
-      this.questions = this.getTestQuestions();
+      this.quizID = id;
+      this.questions = await this.getTestQuestions(id);
       this.question = this.questions[this.step];
       this.showQuestions = true;
       this.title = this.questions[this.step].title;
     },
-    getTestQuestions() {
-      return [
-        {
-          id: 1715,
-          title:
-            "Who is The Elven Sword-Wielding, Green Clothed Hero in the Legend of Zelda series?",
-        },
-        {
-          id: 2243,
-          title:
-            "In what game series are Golden Rings used as life-energy and money",
-        },
-        {
-          id: 3193,
-          title: 'What part of an Xbox 360 causes the "Red Ring of Death"?',
-        },
-        {
-          id: 6001,
-          title: "NES was short for....?",
-        },
-        {
-          id: 8696,
-          title:
-            "How many forms does The Final Boss of The Legend of Dragoon Have?",
-        },
-        {
-          id: 14998,
-          title: "What was the first home console?",
-        },
-      ];
+
+    async getTestQuestions(id) {
+      const res = await fetch(
+        `https://printful.com/test-quiz.php?action=questions&quizId=${id}`
+      );
+
+      return await res.json()
     },
-    getTests() {
-      //Implement get request
+    async checkAnswers(checkedAnswers) {
+      let answers = "";
+      checkedAnswers.forEach((answer) => {
+        answers += `&answers[]=${answer}`;
+      });
+
+      const res = await fetch(
+        `https://printful.com/test-quiz.php?action=submit&quizId=${this.quizID}${answers}`
+      );
+
+      return await res.json()
     },
-    nextQuestion() {
+    nextQuestion(checkedOptions) {
       this.step++;
       this.question = this.questions[this.step];
       this.title = this.questions[this.step].title;
-      console.log(this.step)
-    }
+      this.checkedAnswers = [...this.checkedAnswers, ...checkedOptions];
+      console.log(checkedOptions)
+      console.log(this.checkedAnswers)
+      this.correctAnswers = this.checkAnswers(this.checkedAnswers);
+    },
   },
   data() {
     return {
       title: "Technical task Printful",
       showQuestions: false,
       name: "",
-      availableTests: [],
+      quizID: null,
       questions: [],
       question: {},
       step: 0,
+      correctAnswers: 0,
+      checkedAnswers: [],
     };
-  },
-  created() {
-    this.availableTests = [
-      {
-        id: 1,
-        title: "Video Games",
-      },
-      {
-        id: 2,
-        title: "Numbers",
-      },
-      {
-        id: 3,
-        title: "Movies",
-      },
-    ];
   },
 };
 </script>
