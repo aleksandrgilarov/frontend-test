@@ -4,11 +4,12 @@
     class="container-fluid full-height flex-center flex-column bg-grey"
   >
     <Title :title="title" />
-    <FirstStep v-if="!showQuestions" @start-test="startTest"/>
-    <div v-if="showQuestions">
-      <Question :quizid="quizID" :question="question" @next-question="nextQuestion"/>
+    <FirstStep v-if="!showQuestions && !lastStep" @start-test="startTest"/>
+    <div v-if="showQuestions && !lastStep">
+      <Question :buttonLabel="buttonLabel" :options="options" @next-question="nextQuestion"/>
       <b-progress :value="step" :max="questions.length" animated variant="success" class="mt-2" ></b-progress>
     </div>
+    <p v-if="lastStep">You responded correctly to {{ this.correctAnswers.correct }} out of {{ this.correctAnswers.total }} questions</p>
   </div>
 </template>
 
@@ -30,8 +31,10 @@ export default {
       this.quizID = id;
       this.questions = await this.getTestQuestions(id);
       this.question = this.questions[this.step];
+      this.options = await this.getOptions();
       this.showQuestions = true;
       this.title = this.questions[this.step].title;
+      this.step++;
     },
 
     async getTestQuestions(id) {
@@ -40,6 +43,13 @@ export default {
       );
 
       return await res.json()
+    },
+    async getOptions() {
+      const res = await fetch(
+          `https://printful.com/test-quiz.php?action=answers&quizId=${this.quizID}&questionId=${this.question.id}`
+      );
+
+      return await res.json();
     },
     async checkAnswers(checkedAnswers) {
       let answers = "";
@@ -53,27 +63,37 @@ export default {
 
       return await res.json()
     },
-    nextQuestion(checkedOptions) {
-      this.step++;
-      this.question = this.questions[this.step];
-      this.title = this.questions[this.step].title;
-      this.checkedAnswers = [...this.checkedAnswers, ...checkedOptions];
-      console.log(checkedOptions)
-      console.log(this.checkedAnswers)
-      this.correctAnswers = this.checkAnswers(this.checkedAnswers);
+    async nextQuestion(checkedOptions) {
+      if (this.step === this.questions.length) {
+        this.title = `Thanks, ${this.name}`;
+        this.lastStep = true;
+      } else {
+        this.question = this.questions[this.step];
+        this.options = await this.getOptions();
+        this.title = this.questions[this.step].title;
+        this.checkedAnswers = [...this.checkedAnswers, ...checkedOptions];
+        this.correctAnswers = await this.checkAnswers(this.checkedAnswers);
+        this.step++;
+        if (this.step === this.questions.length) {
+          this.buttonLabel = "Finish";
+        }
+      }
     },
   },
   data() {
     return {
       title: "Technical task Printful",
       showQuestions: false,
+      lastStep: false,
       name: "",
       quizID: null,
       questions: [],
+      options: [],
       question: {},
       step: 0,
       correctAnswers: 0,
       checkedAnswers: [],
+      buttonLabel: "Next",
     };
   },
 };

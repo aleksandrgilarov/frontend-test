@@ -20,10 +20,9 @@
         type="button"
         @click="nextStep()"
         :disabled="checkedOptions.length === 0"
-        :value="btnText"
+        :value="buttonLabel"
         class="btn btn-block rounded-pill font-weight-bold mt-4 bg-brand-primary custom-button"
       >
-
     </div>
   </div>
 </template>
@@ -31,30 +30,17 @@
 <script>
 export default {
   name: "Question",
-  props: ["question", "quizid"],
+  props: ["options", "buttonLabel"],
   methods: {
     async nextStep() {
       this.$emit("next-question", this.checkedOptions);
       this.checkedOptions = [];
-      this.options = await this.getOptions();
-    },
-    async getOptions() {
-      const res = await fetch(
-        `https://printful.com/test-quiz.php?action=answers&quizId=${this.quizid}&questionId=${this.question.id}`
-      );
-
-      return await res.json();
     },
   },
   data() {
     return {
-      options: [],
       checkedOptions: [],
-      btnText: "Next",
     };
-  },
-  async created() {
-    this.options = await this.getOptions();
   },
 };
 </script>
