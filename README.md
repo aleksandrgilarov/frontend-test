@@ -1,24 +1,14 @@
-# test-vue
+# Technical task
 
-## Project setup
+## Project setup: clone repository then run 2 commands
 ```
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
+# Comments about my solution
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+No backend implementation needed as far as API is used. 
+Used bootstrap-vue. 
+App is split into 3 different components: first step form, question and title. 
+SCSS used for styles. 
